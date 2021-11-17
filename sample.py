@@ -1,38 +1,14 @@
 # 파이썬 문법에 익숙하지 않아 헷갈리는 코드는 이곳에서 테스트합니다
 # 알고리즘 공부중 풀이한 문제는 이곳에서 풀이합니다. (풀이를 따로 기록할 경우 별도 파일 만듬)
-t = int(input())
-result = list()
 
-
-def binary_search(num, am):
-    start = 0
-    end = len(am) - 1
-    total = 1.5
-    while start <= end:
-        mid = (start + end) // 2
-        if am[mid] < num:
-            total = mid
-            start = mid + 1
-        else:
-            end = mid - 1
-
-    if total == 1.5:
-        total = 0
-    else:
-        total += 1
-    return total
-
-
-for i in range(t):
-    n, m = map(int, input().split())
-    an = list(map(int, input().split()))
-    am = list(map(int, input().split()))
-    am.sort()
-    alls = 0
-
-    for j in an:
-        alls += binary_search(j, am)
-    result.append(alls)
-
-for i in range(t):
-    print(result[i])
+n = int(input())
+result = 0
+while n >= 0:
+    if n % 5 == 0:
+        result += n // 5
+        break
+    n -= 3
+    result += 1
+if n < 0:
+    result = -1
+print(result)
