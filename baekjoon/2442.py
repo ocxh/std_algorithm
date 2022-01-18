@@ -1,5 +1,0 @@
-n = int(input())
-count = 1
-for i in range(1, n + 1):
-    print(" " * (n - i) + "*" * count)
-    count += 2
