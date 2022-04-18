@@ -1,125 +1,110 @@
-#include <stdio.h>
+#include<stdio.h>
+#include<stdlib.h>
 #pragma warning (disable: 4326 4996 6031)
+#define MAX 5
 
-#define N 10
+typedef int Data;
 
-typedef int Item;
-
-typedef struct {
-	Item items[N];
-	int nFront;
-	int nRear;
-}	Queue, *QueuePtr;
-
-void main()
+typedef struct _cQueue
 {
-	int  IsEmptyQueue(QueuePtr pQueue);
-	int  IsFullQueue(QueuePtr pQueue);
-	int  AddQueue(QueuePtr pQueue, Item nItem);
-	int  JumpInQueue(QueuePtr pQueue, Item nItem);
-	int  DeleteQueue(QueuePtr pQueue, Item& nItem);
-	int  MagnanimousQueue(QueuePtr pQueue, Item& nItem);
-	void PrintQueue(QueuePtr pQueue);
-	int  Error(const char *sMsg);
+	int rear;
+	int front;
+	Data qArr[MAX];
+}cQueue;
 
-	/** Create Queue **/
-	Queue aQueue;
-	aQueue.nFront = aQueue.nRear = 0;
+typedef cQueue Queue;
+
+void InitQueue(Queue* pq);
+int IsEmpty(Queue* pq);
+int NextIdx(int pos);
+void Enqueue1(Queue* pq, Data data);
+void Dequeue1(Queue* pq);
+
+void Enqueue2(Queue* pq, Data data);
+void Dequeue2(Queue* pq);
+
+void PrtQueue(Queue* pq);
+
+int main()
+{
+	int option;
+	int value;
+	Queue pq;
+	InitQueue(&pq);
 	while (1) {
-		int value;
-		printf("-3:끝, -2:양보, -1:삭제, 0~999:삽입, *:새치기 ? ");
-		scanf("%d", &value);
-		if (value < -2)
+		printf("1: 종료 2: Enqeue1 3. Dequeue1 4. Enqueue2 5: Dequeue2: ");
+		scanf("%d", &option);
+		switch (option)
+		{
+		case 1:
+			return 0;
+		case 2:
+			printf("추가할 값 입력: ");
+			scanf("%d", &value);
+			Enqueue1(&pq, value);
 			break;
-		else if (value == -2) {
-			if (MagnanimousQueue(&aQueue, value) == false)
-				Error("empty");
-			else
-				printf("%d is deleted(양보)\n", value);
+		case 3:
+			Dequeue1(&pq);
+			break;
+		case 4:
+			printf("추가할 값 입력: ");
+			scanf("%d", &value);
+			Enqueue2(&pq, value);
+			break;
+		case 5:
+			Dequeue1(&pq);
+			break;
 		}
-		else if (value == -1) {
-			if (DeleteQueue(&aQueue, value) == false)
-				Error("empty");
-			else
-				printf("%d is deleted(삭제)\n", value);
-		}
-		else if (value < 1000) {
-			if (AddQueue(&aQueue, value) == false)
-				Error("full");
-			else
-				printf("%d is inserted(삽입)\n", value);
-		}
-		else {
-			if (JumpInQueue(&aQueue, value %= 1000) == false)
-				Error("full");
-			else
-				printf("%d is inserted(새치기)\n", value);
-		}
-		PrintQueue(&aQueue);
+		PrtQueue(&pq);
 	}
 }
 
-int IsEmptyQueue(QueuePtr pQueue)
-{	// 큐가 비었는지에 따라 T/F를 반환한다.
-	return pQueue->nFront == pQueue->nRear;
-}
-
-int IsFullQueue(QueuePtr pQueue)
-{	// 큐가 가득 찼는지에 따라 T/F를 반환한다.
-	return (pQueue->nRear + 1) % N == pQueue->nFront;
-}
-
-int AddQueue(QueuePtr pQueue, Item nItem)
-{	// 큐에 nItem을 추가하는데 승패에 따라 T/F를 반환한다.
-	if (IsFullQueue(pQueue))
-		return false;
-	pQueue->items[pQueue->nRear = (pQueue->nRear + 1) % N] = nItem;	// rear를 증가하여 넣음
-	return true;
-}
-
-int JumpInQueue(QueuePtr pQueue, Item nItem)
-{	// 큐에 nItem을 앞끝에 새치기하는데 승패에 따라 T/F를 반환한다.
-	if (IsFullQueue(pQueue))
-		return false;
-	pQueue->items[pQueue->nFront] = nItem;
-	pQueue->nFront = (pQueue->nFront + N - 1) % N;	// front에 item을 넣고 감소
-	return true;
-}
-
-int DeleteQueue(QueuePtr pQueue, Item& nItem)
-{	// 큐에서 삭제하여 nItem에 저장하는데 승패에 따라 T/F를 반환한다.
-	if (IsEmptyQueue(pQueue))
-		return false;
-	nItem = pQueue->items[pQueue->nFront = (pQueue->nFront + 1) % N];	// front를 증가하여 받아냄
-	return true;
-}
-
-int MagnanimousQueue(QueuePtr pQueue, Item& nItem)
-{	// 큐에서 뒤끝을 삭제하여 nItem에 저장하는데 승패에 따라 T/F를 반환한다.
-	if (IsEmptyQueue(pQueue))
-		return false;
-	nItem = pQueue->items[pQueue->nRear];
-	pQueue->nRear = (pQueue->nRear + N - 1) % N;	// rear의 item을 받아내고 감소
-	return true;
-}
-
-void PrintQueue(QueuePtr pQueue)
+void InitQueue(Queue* pq)
 {
-	int nCtr = (pQueue->nRear - pQueue->nFront + N) % N;
-	for (int i = 1; i <= nCtr; i++)
-		printf("--%d-", (pQueue->nFront + i) % N);
-	printf("--\n");
-	for (int i = 1; i <= nCtr; i++)
-		printf("%3d ", pQueue->items[(pQueue->nFront + i) % N]);
+	pq->rear = 0;
+	pq->front = 0;
+	for (int i = 0; i < MAX; i++) {
+		pq->qArr[i] = 0;
+	}
+}
+
+int IsEmpty(Queue* pq)
+{
+	return (pq->rear == pq->front) ? true : false;
+}
+
+int NextIdx(int pos)
+{
+	return (pos == MAX-1) ? 0 : pos + 1;
+}
+
+void Enqueue1(Queue* pq, Data data)
+{
+	pq->qArr[pq->rear = NextIdx(pq->rear)] = data;
+}
+
+void Dequeue1(Queue* pq)
+{
+	pq->qArr[pq->front] = 0;
+	pq->front = NextIdx(pq->front);
+}
+
+void Enqueue2(Queue* pq, Data data)
+{
+	pq->qArr[pq->front] = data;
+	pq->front = (pq->front + MAX - 1) % MAX;
+}
+
+void Dequeue2(Queue* pq)
+{
+	pq->qArr[pq->rear] = 0;
+	pq->rear -= 1;
+}
+
+void PrtQueue(Queue* pq)
+{
+	for (int i = 0; i < MAX; i++) {
+		printf("%d ", pq->qArr[i]);
+	}
 	printf("\n");
-	for (int i = 1; i <= nCtr; i++)
-		printf("----");
-	printf("--\n\n");
 }
-
-int Error(const char *sMsg)
-{
-	printf("***** Queue is %s. *****\n", sMsg);
-	return -1;
-}
-
